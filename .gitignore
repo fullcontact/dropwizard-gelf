@@ -9,9 +9,22 @@ release.properties
 *.iml
 *.ipr
 
-# Eclipse
-.settings/
-.classpath
-.project
-
 logs/
+
+*.class
+*.DS_Store
+
+# Package Files #
+*.war
+*.ear
+*.jar
+
+build/
+classes/
+
+.gradle/
+out
+*~
+
+# vim swap files
+*.swp

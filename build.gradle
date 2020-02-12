@@ -1,0 +1,139 @@
+buildscript {
+    // Sets up repositories for the buildscript itself, not the projects
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.2'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.10'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+ext {
+    // Establish version and status
+    githubProjectName = rootProject.name
+    // Change if github project name is not the same as the root project's name
+
+    jacksonVersion = "2.10.1"
+
+    dropwizardVersion = '2.0.0'
+
+    artifactoryUrlBase = "https://fullcontact.jfrog.io/fullcontact"
+
+}
+
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        credentials {
+            username "$repoUsername"
+            password "$repoPassword"
+        }
+        url artifactoryUrlBase + "/repo"
+    }
+    maven {
+        url "http://dl.bintray.com/content/fullcontact/fullcontact-oss"
+    }
+    maven {
+        url "https://packages.confluent.io/maven/"
+    }
+}
+
+// Configure repo(s) to upload archives/artifacts to
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: "$artifactoryUrlBase/libs-releases-local") {
+//                authentication(userName: "$repoUsername", password: "$repoPassword")
+//            }
+//        }
+//    }
+//}
+// Tell the maven.artifacts configuration about an archive, sourced from the
+// java.jar task
+artifacts {
+    archives jar
+}
+
+test {
+    maxParallelForks = (int) Runtime.getRuntime().availableProcessors()
+    getReports().getJunitXml().setDestination(file("$buildDir/reports/tests/xml"))
+    getReports().getHtml().setDestination(file("$buildDir/reports/tests/html"))
+    setBinResultsDir(file("$buildDir/reports/tests/bin"))
+}
+
+
+//apply plugin: 'java'
+//apply plugin: 'maven'
+apply plugin: 'project-report'
+group = "com.fullcontact.fulldw"
+configurations.all {
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: 'log4j', module: 'log4j'
+
+    resolutionStrategy {
+        force "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+        force("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+        force("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+        force("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
+        force("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
+        force("com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:$jacksonVersion")
+        force("com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:$jacksonVersion")
+    }
+}
+
+dependencies {
+    // Note: Later versions change some annotations which interact with Jackson.
+    // If you upgrade, expect some pain from dealing with the resulting fallout.
+    compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
+    compile "biz.paluch.logging:logstash-gelf:1.12.0"
+
+    testCompile("junit:junit:4.12") { force = true }
+    testCompile 'org.mockito:mockito-core:2.24.0'
+    testCompile "io.dropwizard:dropwizard-testing:$dropwizardVersion"
+
+}
+
+//test {
+//}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if (version.endsWith("-SNAPSHOT")) {
+                repository(url: "https://fullcontact.artifactoryonline.com/fullcontact/libs-snapshots-local") {
+                    authentication(userName: "$repoUsername", password: "$repoPassword")
+                }
+            } else {
+                repository(url: "https://fullcontact.artifactoryonline.com/fullcontact/libs-releases-local") {
+                    authentication(userName: "$repoUsername", password: "$repoPassword")
+                }
+            }
+        }
+    }
+}
+
+
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+dependencies {
+    // This dependency is used by the application.
+    implementation 'com.google.guava:guava:28.0-jre'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+}
+

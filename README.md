@@ -1,3 +1,18 @@
+This repo is forked from [dropwizrd-gelf](https://github.com/gini/dropwizard-gelf) and 
+updated the dependency to dropwizard-2.0.0 to make it DropWizard 2.0 compatible.
+
+### publish new version to FC artifactory
+
+```shell
+$ ./gradlew :uploadArchives
+```
+
+### import it to gradle project
+```java
+compile "com.fullcontact.fulldw:dropwizard-gelf:0.0.2"
+``` 
+
+
 Dropwizard GELF
 ===============
 [![Build Status](https://travis-ci.org/gini/dropwizard-gelf.svg?branch=master)](https://travis-ci.org/gini/dropwizard-gelf)
