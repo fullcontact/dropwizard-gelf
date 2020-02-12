@@ -9,7 +9,7 @@ $ ./gradlew :uploadArchives
 
 ### import it to gradle project
 ```java
-compile "com.fullcontact.fulldw:dropwizard-gelf:0.0.2"
+compile "com.fullcontact.fulldw:dropwizard-gelf:2.0.0"
 ``` 
 
 
